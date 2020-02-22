@@ -1,7 +1,32 @@
+/**
+ * @typedef {object} Action
+ * 
+ * @property {'GOT_ANGULAR_VERSION'} type
+ * @property {any} payload
+ */
 
-function handleMessage(request, sender, sendResponse) {
-  console.log("Message from the content script: " + request.type + request.payload);
-  sendResponse({response: "Response from background script"});
+
+ /**
+  * General handler of the all runtime messages
+  * @param {Action} request Incoming message
+  * @param {*} sender 
+  * @param {*} sendResponse 
+  */
+function runtimeMessagesHandler(request, sender, sendResponse) {
+  switch (request.type) {
+    case 'GOT_ANGULAR_VERSION':
+      return postAngularVersionToContent(request.payload);
+    default:
+      return;
+  }
 }
 
-browser.runtime.onMessage.addListener(handleMessage);
+/**
+ * Send Angular version to the content script
+ * @param {number} version Angular version
+ */
+function postAngularVersionToContent(version) {
+  throw new Error('Not implemented');
+}
+
+browser.runtime.onMessage.addListener(runtimeMessagesHandler);
