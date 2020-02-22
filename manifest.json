@@ -12,6 +12,11 @@
       "js": ["page/get-angular-version.js"]
     }
   ],
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
   "author" : "Igor Klymenok",
   "icons": {
     "16": "img/angular.png",
