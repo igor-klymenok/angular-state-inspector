@@ -3,7 +3,8 @@
   "name": "Angular state inspector",
   "description": "Helps you debug Angular component state, inside the Elements tab of the DevTools",
   "version": "1.2",
-  "devtools_page": "index.html",
+
+  "devtools_page": "devtools/index.html",
   "author" : "Igor Klymenok",
   "icons": {
     "16": "img/angular.png",
