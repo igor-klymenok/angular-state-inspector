@@ -1,32 +1,30 @@
 /**
- * @typedef {object} Action
- * 
- * @property {'GOT_ANGULAR_VERSION'} type
- * @property {any} payload
+ * Broadcasts an event to any part of the app
+ * @param {'BACKGROUND' | 'CONTENT' | 'DEVTOOLS'} direction To which side of the app should be sent
+ * @param {Action<any>} message Browser runtime predefined message
  */
+function broadcastMessageTo(direction, message) {
+  if (direction === 'CONTENT') {
+    return browser.tabs.getCurrent()
+      .then(tab => browser.tabs.sendMessage(tab.id, message))
+      .catch(console.error);
+  }
 
+  if (direction === 'BACKGROUND') {
+    throw new Error('Not implemented');
+  }
 
- /**
-  * General handler of the all runtime messages
-  * @param {Action} request Incoming message
-  * @param {*} sender 
-  * @param {*} sendResponse 
-  */
-function runtimeMessagesHandler(request, sender, sendResponse) {
-  switch (request.type) {
-    case 'GOT_ANGULAR_VERSION':
-      return postAngularVersionToContent(request.payload);
-    default:
-      return;
+  if (direction === 'DEVTOOLS') {
+    throw new Error('Not implemented');
   }
 }
 
-/**
- * Send Angular version to the content script
- * @param {number} version Angular version
- */
-function postAngularVersionToContent(version) {
-  throw new Error('Not implemented');
-}
+browser.runtime.onMessage.addListener((message) => {
+  switch (message.type) {
+    case 'GOT_ANGULAR_VERSION':
+      return broadcastMessageTo('DEVTOOLS', message);
 
-browser.runtime.onMessage.addListener(runtimeMessagesHandler);
+    default:
+      return undefined;
+  }
+});

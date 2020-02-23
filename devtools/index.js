@@ -7,13 +7,6 @@ if (elementsPanel) {
   });
 }
 
-function getAngularVersion() {
-  const appRoot = document.getElementsByTagName('app-root').item(0);
-  const angularVersion = appRoot.getAttribute('ng-version');
-
-  return Number(angularVersion);
-}
-
 // The function below is executed in the context of the inspected page.
 function getPanelContents() {
   const ng = window.ng;
@@ -30,8 +23,6 @@ function getPanelContents() {
 }
 
 function getPanelContentsBasedOnNgVersion(version) {
-  console.log('Angular Version', version, typeof version);
-
   let panelContent = Object.create(null);
 
   if (version >= 9) {
