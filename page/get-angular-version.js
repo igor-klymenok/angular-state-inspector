@@ -12,7 +12,9 @@ function getAngularVersion() {
   return undefined;
 }
 
-browser.runtime.sendMessage({
-  type: 'GOT_ANGULAR_VERSION',
-  payload: getAngularVersion(),
-});
+browser.runtime
+  .connect({ name: 'content_scripts' })
+  .postMessage({
+    type: 'GOT_ANGULAR_VERSION',
+    payload: getAngularVersion(),
+  });

@@ -1,9 +1,17 @@
+const connectionToBackground = browser.runtime.connect({ name: 'devtools' })
+var version = 2;
+
+connectionToBackground.onMessage.addListener((message) => {
+  console.log('Message from backround in devtools', message)
+  version = message.payload
+})
+
 const panels = browser && browser.devtools && browser.devtools.panels;
 const elementsPanel = panels && panels.elements;
 
 if (elementsPanel) {
   elementsPanel.createSidebarPane('State', sidebar => {
-    elementsPanel.onSelectionChanged.addListener(() => sidebar.setExpression(`(${getPanelContentsBasedOnNgVersion})(${getAngularVersion()})`));
+    elementsPanel.onSelectionChanged.addListener(() => sidebar.setExpression(`(${getPanelContentsBasedOnNgVersion})()`));
   });
 }
 
@@ -22,7 +30,7 @@ function getPanelContents() {
   return panelContent;
 }
 
-function getPanelContentsBasedOnNgVersion(version) {
+function getPanelContentsBasedOnNgVersion() {
   let panelContent = Object.create(null);
 
   if (version >= 9) {
