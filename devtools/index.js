@@ -1,17 +1,9 @@
-const connectionToBackground = browser.runtime.connect({ name: 'devtools' })
-var version = 2;
-
-connectionToBackground.onMessage.addListener((message) => {
-  console.log('Message from backround in devtools', message)
-  version = message.payload
-})
-
 const panels = browser && browser.devtools && browser.devtools.panels;
 const elementsPanel = panels && panels.elements;
 
 if (elementsPanel) {
   elementsPanel.createSidebarPane('State', sidebar => {
-    elementsPanel.onSelectionChanged.addListener(() => sidebar.setExpression(`(${getPanelContentsBasedOnNgVersion})()`));
+    elementsPanel.onSelectionChanged.addListener(() => sidebar.setExpression(`(${getPanelContents})()`));
   });
 }
 
@@ -19,30 +11,30 @@ if (elementsPanel) {
 function getPanelContents() {
   const ng = window.ng;
   const angular = window.angular;
+
   let panelContent = Object.create(null);
-  if ($0) {
-    if (ng && ng.probe($0)) {
-      panelContent = ng.probe($0).componentInstance;
-    } else if (angular) {
-      panelContent = angular.element($0).scope();
+
+  try {
+    if ($0) {
+      if (ng && ng.getComponent && ng.getComponent($0)) {
+        // Angular >= 9
+        panelContent = {
+          name: ng.getComponent($0).constructor.name,
+          state: ng.getComponent($0),
+        }
+      } else if (ng && ng.probe && ng.probe($0)) {
+        // Angular >= 2
+        panelContent = {
+          name: ng.probe($0).componentInstance.constructor.name,
+          state: ng.probe($0).componentInstance,
+        };
+      } else if (angular) {
+        // Angular.js >= 1
+        panelContent = angular.element($0).scope();
+      }
     }
-  }
-  return panelContent;
-}
-
-function getPanelContentsBasedOnNgVersion() {
-  let panelContent = Object.create(null);
-
-  if (version >= 9) {
-    panelContent = window.ng.getComponent($0);
-  }
-
-  if (version >= 2) {
-    panelContent = window.ng.probe($0).componentInstance;
-  }
-
-  if (version >= 1) {
-    panelContent = window.angular.element($0).scope();
+  } catch(error) {
+    panelContent = Object.create(null)
   }
 
   return panelContent;
