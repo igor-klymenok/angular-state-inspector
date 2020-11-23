@@ -13,6 +13,7 @@ if (elementsPanel) {
           sidebar.setObject(result[0]);
         })
         .catch(err => {
+          sidebar.setExpression(`(${getPanelContents})()`)
           console.error(err);
         })
     });
