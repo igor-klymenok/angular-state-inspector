@@ -3,7 +3,19 @@ const elementsPanel = panels && panels.elements;
 
 if (elementsPanel) {
   elementsPanel.createSidebarPane('State', sidebar => {
-    elementsPanel.onSelectionChanged.addListener(() => sidebar.setExpression(`(${getPanelContents})()`));
+    elementsPanel.onSelectionChanged.addListener(() => {
+      browser.devtools.inspectedWindow.eval(`(${getPanelContents})()`)
+        .then(result => {
+          if (!result[0] && result[1]) {
+            throw result[1]
+          }
+          console.log(result[0])
+          sidebar.setObject(result[0]);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    });
   });
 }
 
@@ -35,6 +47,10 @@ function getPanelContents() {
     }
   } catch(error) {
     panelContent = Object.create(null)
+  }
+
+  if (panelContent.state && panelContent.state.__ngContext__) {
+    delete panelContent.state.__ngContext__;
   }
 
   return panelContent;
