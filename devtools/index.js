@@ -21,6 +21,7 @@ if (elementsPanel) {
 }
 
 // The function below is executed in the context of the inspected page.
+// TODO: Check and add support for newer Angular versions if needed
 function getPanelContents() {
   const ng = window.ng;
   const angular = window.angular;
