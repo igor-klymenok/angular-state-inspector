@@ -9,7 +9,6 @@ if (elementsPanel) {
           if (!result[0] && result[1]) {
             throw result[1]
           }
-          console.log(result[0])
           sidebar.setObject(result[0]);
         })
         .catch(err => {
@@ -25,6 +24,19 @@ if (elementsPanel) {
 function getPanelContents() {
   const ng = window.ng;
   const angular = window.angular;
+
+  const getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) {
+          return;
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  };
 
   let panelContent = Object.create(null);
 
@@ -44,15 +56,26 @@ function getPanelContents() {
         };
       } else if (angular) {
         // Angular.js >= 1
-        panelContent = angular.element($0).scope();
+        panelContent = {
+          state: angular.element($0).scope()
+        }
       }
     }
   } catch(error) {
     panelContent = Object.create(null)
   }
 
-  if (panelContent.state && panelContent.state.__ngContext__) {
-    delete panelContent.state.__ngContext__;
+  if (panelContent.state) {
+    const state = JSON.parse(JSON.stringify(panelContent.state, getCircularReplacer()))
+
+    panelContent = {
+      name: panelContent.name,
+      ...state
+    }
+  }
+
+  if (panelContent && panelContent.__ngContext__) {
+    delete panelContent.__ngContext__;
   }
 
   return panelContent;
